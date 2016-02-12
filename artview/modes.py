@@ -174,6 +174,13 @@ navigate_mode= (
     ]
 )
 
+rotation_mode= (
+    [Menu, RadarDisplay, Rotation],
+    [
+        ((2, 'Vradar'), (1, 'Vradar')),
+    ]
+)
+
 modes = [
          {'label': 'Add RadarDisplay',
           'action': radar_mode},
@@ -199,4 +206,6 @@ modes = [
           'action': filedetail_mode},
          {'label': 'Filelist',
           'action': filelist_mode},
+         {'label': 'Simulate real time radar',
+          'action': rotation_mode},
         ]
