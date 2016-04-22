@@ -11,6 +11,9 @@ import os
 #sys.path.append('artview')
 from .. import core
 
+
+TEST_OPTION = 1
+
 class Rotation(core.Component):
 
     csvdata = np.genfromtxt(os.path.dirname(__file__) + '/data_1.csv',
@@ -53,7 +56,15 @@ class Rotation(core.Component):
         self.layout.addWidget(self.button, 0, 0)
         self.running = False
 
-        radar = pyart.testing.make_target_radar()
+        if TEST_OPTION == 1:
+            radar = pyart.testing.make_empty_ppi_radar(1017, 360, 1)
+            radar.fields['reflectivity'] = {'data': np.zeros((360,1017))}
+            radar.fields['reflectivity'] = {}
+        elif TEST_OPTION == 2:
+            radar = pyart.testing.make_empty_ppi_radar(1017, 1340, 1)
+            radar.fields['reflectivity'] = {'data': np.zeros((1340,1017))}
+            radar.azimuth['data'] *= 360./1340
+
         radar.range['data'] = 26.5 * radar.range['data']
         self.field = list(radar.fields.keys())[0]
         radar.fields[self.field]['data']=0*radar.fields[self.field]['data']
@@ -91,12 +102,14 @@ class Rotation(core.Component):
 #        if(self.datapt>=360):
 #            self.datapt=0
 
-        ray = np.mod(self.seed,360)
-        if ray == 359:
-            #example file has only 359 rays
-            ray = 358
-        self.Vradar.value.fields[self.field]['data'][ray] = self.csvdata[ray]
-        self.seed=self.seed+1
+        if TEST_OPTION == 1:
+            ray = np.mod(self.seed,360)
+        elif TEST_OPTION == 2:
+            ray = np.mod(self.seed,1340)
+        self.Vradar.value.fields[self.field]['data'][ray] = self.csvdata[self.seed]
+        self.seed = self.seed + 1
+        if self.seed >= 1340:
+            self.seed = 0
         self.Vradar.update()
 
 _plugins = [Rotation]
